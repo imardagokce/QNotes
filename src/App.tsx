@@ -422,18 +422,18 @@ export default function App() {
       ? 'bg-[#0a0a0c]/98 border-white/10'
       : activeTheme === 'slate'
       ? 'bg-[#0f172a]/98 border-emerald-500/20'
-      : 'bg-spotlight-bg/95 border-spotlight-border'
+      : 'bg-slate-950/92 border-white/10'
 
   return (
     <div className="w-full h-full p-2 flex items-center justify-center select-none bg-transparent">
       {/* Spotlight Card */}
       <div
-        className={`w-full h-full flex flex-col backdrop-blur-2xl rounded-2xl border shadow-spotlight overflow-hidden transition-all duration-200 ${themeClasses}`}
+        className={`w-full h-full flex flex-col backdrop-blur-2xl rounded-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] overflow-hidden transition-all duration-200 ${themeClasses}`}
       >
         {/* Header Drag Region & Spotlight Bar */}
         <div
           data-tauri-drag-region
-          className="flex items-center px-4 py-3 border-b border-spotlight-border bg-spotlight-surface/70 gap-3"
+          className="flex items-center px-4 py-3 border-b border-white/10 bg-slate-900/80 gap-3"
         >
           {/* Brand Glyph */}
           <div className="w-7 h-7 rounded-lg bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center shrink-0 text-indigo-400 font-semibold text-xs tracking-wider">
@@ -446,10 +446,10 @@ export default function App() {
               <div className="flex items-center gap-2 truncate">
                 <button
                   onClick={handleCloseEditor}
-                  className="flex items-center gap-1.5 text-xs text-spotlight-muted hover:text-spotlight-text transition-colors px-2 py-1 rounded-md hover:bg-white/5 shrink-0"
+                  className="flex items-center gap-1.5 text-xs text-spotlight-muted hover:text-spotlight-text transition-colors px-2 py-1 rounded-md hover:bg-slate-900/80 shrink-0"
                 >
                   <span>← Geri</span>
-                  <span className="text-[10px] text-spotlight-dim bg-white/5 px-1 rounded">Esc</span>
+                  <span className="text-[10px] text-spotlight-dim bg-slate-900/80 px-1 rounded border border-white/5">Esc</span>
                 </button>
                 <span className="text-xs font-medium text-white truncate max-w-xs">
                   {activeNote.title || 'Başlıksız Not'}
@@ -463,7 +463,7 @@ export default function App() {
                   className={`text-xs px-2 py-1 rounded-md transition-colors ${
                     activeNote.is_pinned
                       ? 'bg-amber-500/20 text-amber-300'
-                      : 'text-spotlight-dim hover:text-spotlight-text hover:bg-white/5'
+                      : 'text-spotlight-dim hover:text-spotlight-text hover:bg-slate-900/80'
                   }`}
                 >
                   {activeNote.is_pinned ? '📌 Sabitli' : 'Sabitle'}
@@ -507,7 +507,7 @@ export default function App() {
                 setSettingsInitialTab('ai')
                 setShowSettings(true)
               }}
-              className="w-6 h-6 flex items-center justify-center rounded-md text-spotlight-dim hover:text-indigo-400 hover:bg-white/5 transition-colors text-xs"
+              className="w-6 h-6 flex items-center justify-center rounded-md text-spotlight-dim hover:text-indigo-400 hover:bg-slate-900/80 transition-colors text-xs"
               title="AI Yapılandırması"
             >
               ✨
@@ -517,14 +517,14 @@ export default function App() {
                 setSettingsInitialTab('general')
                 setShowSettings(true)
               }}
-              className="w-6 h-6 flex items-center justify-center rounded-md text-spotlight-dim hover:text-spotlight-text hover:bg-white/5 transition-colors text-xs"
+              className="w-6 h-6 flex items-center justify-center rounded-md text-spotlight-dim hover:text-spotlight-text hover:bg-slate-900/80 transition-colors text-xs"
               title="Ayarlar (Ctrl+,)"
             >
               ⚙
             </button>
             <button
               onClick={handleHide}
-              className="w-6 h-6 flex items-center justify-center rounded-md text-spotlight-dim hover:text-spotlight-text hover:bg-white/5 transition-colors text-xs"
+              className="w-6 h-6 flex items-center justify-center rounded-md text-spotlight-dim hover:text-spotlight-text hover:bg-slate-900/80 transition-colors text-xs"
               title="Kapat (Esc)"
             >
               ✕
@@ -543,10 +543,10 @@ export default function App() {
         <div className="flex-1 overflow-hidden flex flex-col relative">
           {activeNote ? (
             /* Note Editor View */
-            <div className="flex-1 flex flex-col p-4 bg-spotlight-bg relative">
+            <div className="flex-1 flex flex-col p-4 bg-slate-950/60 relative">
               
               {/* Quick AI Action Buttons Toolbar */}
-              <div className="flex items-center justify-between pb-2 mb-2 border-b border-spotlight-border/40 gap-2">
+              <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/10 gap-2">
                 <div className="flex items-center gap-1.5 flex-wrap">
                   <span className="text-[10px] font-semibold text-indigo-400 uppercase tracking-wider flex items-center gap-1">
                     <span>✨ AI</span>
@@ -561,7 +561,7 @@ export default function App() {
                       )
                     }
                     disabled={aiLoading}
-                    className="px-2 py-0.5 rounded-md bg-white/5 hover:bg-indigo-600/20 text-spotlight-muted hover:text-indigo-300 text-[11px] font-medium border border-white/5 hover:border-indigo-500/30 transition-all disabled:opacity-50"
+                    className="px-2 py-0.5 rounded-md bg-slate-900/80 hover:bg-indigo-600/20 text-spotlight-muted hover:text-indigo-300 text-[11px] font-medium border border-white/10 hover:border-indigo-500/30 transition-all disabled:opacity-50"
                   >
                     ⚡ Özetle
                   </button>
@@ -575,7 +575,7 @@ export default function App() {
                       )
                     }
                     disabled={aiLoading}
-                    className="px-2 py-0.5 rounded-md bg-white/5 hover:bg-indigo-600/20 text-spotlight-muted hover:text-indigo-300 text-[11px] font-medium border border-white/5 hover:border-indigo-500/30 transition-all disabled:opacity-50"
+                    className="px-2 py-0.5 rounded-md bg-slate-900/80 hover:bg-indigo-600/20 text-spotlight-muted hover:text-indigo-300 text-[11px] font-medium border border-white/10 hover:border-indigo-500/30 transition-all disabled:opacity-50"
                   >
                     📋 Aksiyon Maddeleri
                   </button>
@@ -589,7 +589,7 @@ export default function App() {
                       )
                     }
                     disabled={aiLoading}
-                    className="px-2 py-0.5 rounded-md bg-white/5 hover:bg-indigo-600/20 text-spotlight-muted hover:text-indigo-300 text-[11px] font-medium border border-white/5 hover:border-indigo-500/30 transition-all disabled:opacity-50"
+                    className="px-2 py-0.5 rounded-md bg-slate-900/80 hover:bg-indigo-600/20 text-spotlight-muted hover:text-indigo-300 text-[11px] font-medium border border-white/10 hover:border-indigo-500/30 transition-all disabled:opacity-50"
                   >
                     ✍️ Metni Düzelt
                   </button>
@@ -616,8 +616,8 @@ export default function App() {
 
               {/* AI Result Card Drawer */}
               {aiResult && (
-                <div className="absolute inset-x-3 bottom-10 max-h-[190px] bg-spotlight-surface border border-indigo-500/40 rounded-xl p-3 shadow-2xl flex flex-col gap-2 animate-in slide-in-from-bottom-2 duration-200 z-10">
-                  <div className="flex items-center justify-between border-b border-spotlight-border/60 pb-1.5">
+                <div className="absolute inset-x-3 bottom-10 max-h-[190px] bg-slate-900/95 border border-indigo-500/40 rounded-xl p-3 shadow-2xl flex flex-col gap-2 animate-in slide-in-from-bottom-2 duration-200 z-10">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-1.5">
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-semibold text-indigo-300 flex items-center gap-1">
                         <span>✨</span>
@@ -634,7 +634,7 @@ export default function App() {
                     </button>
                   </div>
 
-                  <div className="flex-1 overflow-y-auto text-xs text-spotlight-text font-sans whitespace-pre-wrap leading-relaxed select-text bg-spotlight-bg/60 p-2 rounded-lg border border-white/5">
+                  <div className="flex-1 overflow-y-auto text-xs text-spotlight-text font-sans whitespace-pre-wrap leading-relaxed select-text bg-slate-950/90 p-2 rounded-lg border border-white/10">
                     {aiResult}
                   </div>
 
@@ -642,7 +642,7 @@ export default function App() {
                     <button
                       type="button"
                       onClick={handleCopyAiResult}
-                      className="px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 text-spotlight-muted hover:text-white text-[10px] font-medium transition-colors"
+                      className="px-2 py-1 rounded-md bg-slate-900/80 hover:bg-slate-800 text-spotlight-muted hover:text-white text-[10px] font-medium transition-colors border border-white/10"
                     >
                       {aiCopied ? '✓ Kopyalandı' : '📋 Kopyala'}
                     </button>
@@ -668,7 +668,7 @@ export default function App() {
 
               {/* AI Error Notification */}
               {aiError && (
-                <div className="absolute inset-x-3 bottom-10 bg-rose-950/80 border border-rose-500/40 rounded-xl p-3 shadow-xl flex items-start justify-between gap-2 z-10">
+                <div className="absolute inset-x-3 bottom-10 bg-rose-950/90 border border-rose-500/40 rounded-xl p-3 shadow-xl flex items-start justify-between gap-2 z-10">
                   <div className="text-xs text-rose-300 space-y-0.5">
                     <div className="font-semibold flex items-center gap-1">
                       <span>⚠️ AI Bağlantı Hatası</span>
@@ -687,7 +687,7 @@ export default function App() {
               )}
 
               {/* Editor Bottom Meta & Actions */}
-              <div className="flex items-center justify-between pt-2.5 border-t border-spotlight-border/60 text-xs text-spotlight-dim">
+              <div className="flex items-center justify-between pt-2.5 border-t border-white/10 text-xs text-spotlight-dim">
                 <div className="flex items-center gap-2">
                   <span>{activeContent.length} karakter</span>
                   <span>•</span>
@@ -724,7 +724,7 @@ export default function App() {
             /* Spotlight Notes List */
             <div
               ref={listRef}
-              className="flex-1 overflow-y-auto divide-y divide-spotlight-border/30 p-1.5"
+              className="flex-1 overflow-y-auto divide-y divide-white/5 p-1.5"
             >
               {notes.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center p-6 text-spotlight-dim">
@@ -735,7 +735,7 @@ export default function App() {
                       </p>
                       <p className="text-xs">
                         Yeni not olarak kaydetmek için{' '}
-                        <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-spotlight-text font-mono text-[10px]">
+                        <kbd className="px-1.5 py-0.5 rounded bg-slate-900/80 border border-white/10 text-spotlight-text font-mono text-[10px]">
                           Enter
                         </kbd>{' '}
                         tuşuna basın.
@@ -743,7 +743,7 @@ export default function App() {
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <div className="w-10 h-10 mx-auto rounded-full bg-white/5 flex items-center justify-center text-spotlight-muted text-lg">
+                      <div className="w-10 h-10 mx-auto rounded-full bg-slate-900/80 border border-white/10 flex items-center justify-center text-spotlight-muted text-lg">
                         ✎
                       </div>
                       <p className="text-sm font-medium text-spotlight-muted">
@@ -751,7 +751,7 @@ export default function App() {
                       </p>
                       <p className="text-xs max-w-xs">
                         Hızlıca aklınızdaki bir düşünceyi yazıp{' '}
-                        <kbd className="px-1 py-0.5 rounded bg-white/10 text-spotlight-text font-mono text-[10px]">
+                        <kbd className="px-1 py-0.5 rounded bg-slate-900/80 border border-white/10 text-spotlight-text font-mono text-[10px]">
                           Enter
                         </kbd>{' '}
                         tuşuna basarak kaydedebilirsiniz.
@@ -775,8 +775,8 @@ export default function App() {
                       onClick={() => handleOpenNote(note)}
                       className={`group flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer transition-all ${
                         isSelected
-                          ? 'bg-indigo-600/15 border-l-2 border-indigo-500 pl-2.5'
-                          : 'hover:bg-spotlight-hover text-spotlight-text border-l-2 border-transparent'
+                          ? 'bg-indigo-600/20 border-l-2 border-indigo-500 pl-2.5'
+                          : 'hover:bg-slate-900/70 text-spotlight-text border-l-2 border-transparent'
                       }`}
                     >
                       <div className="flex-1 min-w-0 pr-3">
@@ -822,7 +822,7 @@ export default function App() {
                           className={`p-1 rounded text-xs transition-colors ${
                             note.is_pinned
                               ? 'text-amber-400'
-                              : 'text-spotlight-dim hover:text-spotlight-text hover:bg-white/10'
+                              : 'text-spotlight-dim hover:text-spotlight-text hover:bg-slate-900/80'
                           }`}
                         >
                           📌
@@ -830,14 +830,14 @@ export default function App() {
                         <button
                           onClick={(e) => handleCopyNote(note, e)}
                           title="İçeriği kopyala"
-                          className="p-1 rounded text-spotlight-dim hover:text-spotlight-text hover:bg-white/10 text-xs"
+                          className="p-1 rounded text-spotlight-dim hover:text-spotlight-text hover:bg-slate-900/80 text-xs"
                         >
                           {copiedId === note.id ? '✓' : '⎘'}
                         </button>
                         <button
                           onClick={(e) => handleDeleteNote(note.id, e)}
                           title="Notu sil"
-                          className="p-1 rounded text-spotlight-dim hover:text-rose-400 hover:bg-white/10 text-xs"
+                          className="p-1 rounded text-spotlight-dim hover:text-rose-400 hover:bg-slate-900/80 text-xs"
                         >
                           ✕
                         </button>
@@ -853,29 +853,29 @@ export default function App() {
         {/* Spotlight Footer Bar */}
         <div
           data-tauri-drag-region
-          className="flex items-center justify-between px-3.5 py-2 bg-spotlight-surface/80 border-t border-spotlight-border text-[11px] text-spotlight-dim"
+          className="flex items-center justify-between px-3.5 py-2 bg-slate-900/80 border-t border-white/10 text-[11px] text-spotlight-dim"
         >
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1">
-              <kbd className="px-1 py-0.5 rounded bg-white/5 border border-white/10 font-mono text-[9px] text-spotlight-muted">
+              <kbd className="px-1 py-0.5 rounded bg-slate-900/80 border border-white/10 font-mono text-[9px] text-spotlight-muted">
                 {activeShortcut}
               </kbd>
               <span>Aç/Kapat</span>
             </span>
             <span className="flex items-center gap-1">
-              <kbd className="px-1 py-0.5 rounded bg-white/5 border border-white/10 font-mono text-[9px] text-spotlight-muted">
+              <kbd className="px-1 py-0.5 rounded bg-slate-900/80 border border-white/10 font-mono text-[9px] text-spotlight-muted">
                 ↵
               </kbd>
               <span>{activeNote ? 'Bitti' : 'Aç / Kaydet'}</span>
             </span>
             <span className="flex items-center gap-1">
-              <kbd className="px-1 py-0.5 rounded bg-white/5 border border-white/10 font-mono text-[9px] text-spotlight-muted">
+              <kbd className="px-1 py-0.5 rounded bg-slate-900/80 border border-white/10 font-mono text-[9px] text-spotlight-muted">
                 ↑↓
               </kbd>
               <span>Gezin</span>
             </span>
             <span className="flex items-center gap-1">
-              <kbd className="px-1 py-0.5 rounded bg-white/5 border border-white/10 font-mono text-[9px] text-spotlight-muted">
+              <kbd className="px-1 py-0.5 rounded bg-slate-900/80 border border-white/10 font-mono text-[9px] text-spotlight-muted">
                 Esc
               </kbd>
               <span>{activeNote ? 'Geri' : 'Gizle'}</span>

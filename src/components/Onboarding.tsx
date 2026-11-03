@@ -160,7 +160,7 @@ export default function Onboarding({
   return (
     <div className="w-full h-full p-2 flex items-center justify-center select-none bg-transparent">
       {/* Modal Container */}
-      <div className="w-full h-full flex flex-col justify-between bg-spotlight-bg/98 backdrop-blur-2xl rounded-2xl border border-spotlight-border shadow-spotlight overflow-hidden p-5 animate-in fade-in duration-200">
+      <div className="w-full h-full flex flex-col justify-between bg-slate-950/92 backdrop-blur-2xl rounded-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] overflow-hidden p-5 animate-in fade-in duration-200">
         
         {/* Top Header & Tab Navigation */}
         <div className="space-y-3 shrink-0">
@@ -184,7 +184,7 @@ export default function Onboarding({
             {onClose && !isFirstRun && (
               <button
                 onClick={onClose}
-                className="w-6 h-6 flex items-center justify-center rounded-md text-spotlight-dim hover:text-white hover:bg-white/5 transition-colors text-xs"
+                className="w-6 h-6 flex items-center justify-center rounded-md text-spotlight-dim hover:text-white hover:bg-slate-900/80 transition-colors text-xs"
                 title="Kapat"
               >
                 ✕
@@ -193,7 +193,7 @@ export default function Onboarding({
           </div>
 
           {/* Tab Selector */}
-          <div className="flex rounded-xl bg-spotlight-surface p-1 border border-spotlight-border">
+          <div className="flex rounded-xl bg-slate-900/80 p-1 border border-white/10">
             <button
               type="button"
               onClick={() => setActiveTab('general')}
@@ -234,8 +234,8 @@ export default function Onboarding({
                   onClick={() => setShortcut('Alt+Space')}
                   className={`flex items-center justify-between p-2.5 rounded-xl border text-left transition-all ${
                     shortcut === 'Alt+Space'
-                      ? 'bg-indigo-600/15 border-indigo-500 text-white shadow-sm'
-                      : 'bg-spotlight-surface border-spotlight-border text-spotlight-muted hover:border-white/20'
+                      ? 'bg-indigo-600/20 border-indigo-500 text-white shadow-sm'
+                      : 'bg-slate-900/80 border-white/10 text-spotlight-muted hover:border-white/20'
                   }`}
                 >
                   <div>
@@ -250,8 +250,8 @@ export default function Onboarding({
                   onClick={() => setShortcut('Ctrl+Space')}
                   className={`flex items-center justify-between p-2.5 rounded-xl border text-left transition-all ${
                     shortcut === 'Ctrl+Space'
-                      ? 'bg-indigo-600/15 border-indigo-500 text-white shadow-sm'
-                      : 'bg-spotlight-surface border-spotlight-border text-spotlight-muted hover:border-white/20'
+                      ? 'bg-indigo-600/20 border-indigo-500 text-white shadow-sm'
+                      : 'bg-slate-900/80 border-white/10 text-spotlight-muted hover:border-white/20'
                   }`}
                 >
                   <div>
@@ -264,7 +264,7 @@ export default function Onboarding({
             </div>
 
             {/* Autostart Toggle */}
-            <div className="flex items-center justify-between p-2.5 rounded-xl bg-spotlight-surface border border-spotlight-border">
+            <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/80 border border-white/10">
               <div className="space-y-0.5">
                 <div className="text-xs font-medium text-spotlight-text">
                   2. Windows Başlangıcında Çalıştır
@@ -278,7 +278,7 @@ export default function Onboarding({
                 type="button"
                 onClick={() => setAutostart(!autostart)}
                 className={`w-11 h-6 flex items-center rounded-full p-1 transition-colors duration-200 ease-in-out shrink-0 ${
-                  autostart ? 'bg-indigo-600' : 'bg-white/10'
+                  autostart ? 'bg-indigo-600' : 'bg-slate-800 border border-white/10'
                 }`}
               >
                 <div
@@ -301,8 +301,8 @@ export default function Onboarding({
                   onClick={() => setTheme('midnight')}
                   className={`p-2 rounded-xl border text-center transition-all ${
                     theme === 'midnight'
-                      ? 'bg-indigo-600/15 border-indigo-500 text-white'
-                      : 'bg-spotlight-surface border-spotlight-border text-spotlight-muted hover:border-white/20'
+                      ? 'bg-indigo-600/20 border-indigo-500 text-white'
+                      : 'bg-slate-900/80 border-white/10 text-spotlight-muted hover:border-white/20'
                   }`}
                 >
                   <div className="w-3.5 h-3.5 mx-auto rounded-full bg-[#181820] border border-indigo-500/50 mb-1" />
@@ -314,8 +314,8 @@ export default function Onboarding({
                   onClick={() => setTheme('obsidian')}
                   className={`p-2 rounded-xl border text-center transition-all ${
                     theme === 'obsidian'
-                      ? 'bg-indigo-600/15 border-indigo-500 text-white'
-                      : 'bg-spotlight-surface border-spotlight-border text-spotlight-muted hover:border-white/20'
+                      ? 'bg-indigo-600/20 border-indigo-500 text-white'
+                      : 'bg-slate-900/80 border-white/10 text-spotlight-muted hover:border-white/20'
                   }`}
                 >
                   <div className="w-3.5 h-3.5 mx-auto rounded-full bg-[#0a0a0c] border border-white/20 mb-1" />
@@ -327,8 +327,8 @@ export default function Onboarding({
                   onClick={() => setTheme('slate')}
                   className={`p-2 rounded-xl border text-center transition-all ${
                     theme === 'slate'
-                      ? 'bg-indigo-600/15 border-indigo-500 text-white'
-                      : 'bg-spotlight-surface border-spotlight-border text-spotlight-muted hover:border-white/20'
+                      ? 'bg-indigo-600/20 border-indigo-500 text-white'
+                      : 'bg-slate-900/80 border-white/10 text-spotlight-muted hover:border-white/20'
                   }`}
                 >
                   <div className="w-3.5 h-3.5 mx-auto rounded-full bg-[#1e293b] border border-emerald-500/50 mb-1" />
@@ -359,8 +359,8 @@ export default function Onboarding({
                       onClick={() => handleProviderSelect(key)}
                       className={`p-2 rounded-xl border text-center transition-all ${
                         isSelected
-                          ? 'bg-indigo-600/15 border-indigo-500 text-white shadow-sm'
-                          : 'bg-spotlight-surface border-spotlight-border text-spotlight-muted hover:border-white/20'
+                          ? 'bg-indigo-600/20 border-indigo-500 text-white shadow-sm'
+                          : 'bg-slate-900/80 border-white/10 text-spotlight-muted hover:border-white/20'
                       }`}
                     >
                       <div className="text-sm mb-0.5">{p.icon}</div>
@@ -384,7 +384,7 @@ export default function Onboarding({
                 value={aiEndpoint}
                 onChange={(e) => setAiEndpoint(e.target.value)}
                 placeholder="http://localhost:11434 veya https://api.openai.com"
-                className="w-full px-3 py-1.5 rounded-lg bg-spotlight-surface border border-spotlight-border text-xs text-white placeholder-spotlight-dim outline-none focus:border-indigo-500 font-mono"
+                className="w-full px-3 py-1.5 rounded-lg bg-slate-900/80 border border-white/10 text-xs text-white placeholder-spotlight-dim outline-none focus:border-indigo-500 font-mono"
               />
             </div>
 
@@ -408,7 +408,7 @@ export default function Onboarding({
                       ? 'sk-...'
                       : 'Opsiyonel (Yerel LLM)'
                   }
-                  className="w-full pl-3 pr-8 py-1.5 rounded-lg bg-spotlight-surface border border-spotlight-border text-xs text-white placeholder-spotlight-dim outline-none focus:border-indigo-500 font-mono"
+                  className="w-full pl-3 pr-8 py-1.5 rounded-lg bg-slate-900/80 border border-white/10 text-xs text-white placeholder-spotlight-dim outline-none focus:border-indigo-500 font-mono"
                 />
                 <button
                   type="button"
@@ -431,7 +431,7 @@ export default function Onboarding({
                 value={aiModel}
                 onChange={(e) => setAiModel(e.target.value)}
                 placeholder="gpt-4o-mini, llama3, qwen2.5-coder..."
-                className="w-full px-3 py-1.5 rounded-lg bg-spotlight-surface border border-spotlight-border text-xs text-white placeholder-spotlight-dim outline-none focus:border-indigo-500 font-mono"
+                className="w-full px-3 py-1.5 rounded-lg bg-slate-900/80 border border-white/10 text-xs text-white placeholder-spotlight-dim outline-none focus:border-indigo-500 font-mono"
               />
 
               {/* Quick Preset Model Chips */}
@@ -445,7 +445,7 @@ export default function Onboarding({
                       className={`px-1.5 py-0.5 rounded text-[10px] font-mono transition-colors ${
                         aiModel === m
                           ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40'
-                          : 'bg-white/5 text-spotlight-dim hover:text-white'
+                          : 'bg-slate-900/80 border border-white/10 text-spotlight-dim hover:text-white'
                       }`}
                     >
                       {m}
@@ -458,12 +458,12 @@ export default function Onboarding({
         )}
 
         {/* Footer Actions */}
-        <div className="pt-2 border-t border-spotlight-border/60 flex items-center gap-2 shrink-0">
+        <div className="pt-2 border-t border-white/10 flex items-center gap-2 shrink-0">
           {onClose && !isFirstRun && (
             <button
               type="button"
               onClick={onClose}
-              className="py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 text-spotlight-muted hover:text-white text-xs font-medium transition-all"
+              className="py-2 px-3 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-white/10 text-spotlight-muted hover:text-white text-xs font-medium transition-all"
             >
               Vazgeç
             </button>
