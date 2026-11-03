@@ -31,7 +31,7 @@ jobs:
         run: pnpm audit --json > pnpm-audit-report.json
 
       - name: Upload security reports as artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v7
         with:
           name: security-reports
           path: |
