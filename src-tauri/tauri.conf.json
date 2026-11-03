@@ -14,17 +14,19 @@
       {
         "label": "main",
         "title": "QNotes",
-        "width": 700,
-        "height": 480,
-        "minWidth": 400,
-        "minHeight": 300,
-        "resizable": true,
+        "width": 680,
+        "height": 420,
+        "minWidth": 500,
+        "minHeight": 320,
+        "resizable": false,
         "fullscreen": false,
         "decorations": false,
         "transparent": true,
         "alwaysOnTop": true,
+        "center": true,
+        "shadow": false,
         "skipTaskbar": true,
-        "visible": false
+        "visible": true
       }
     ],
     "security": {
