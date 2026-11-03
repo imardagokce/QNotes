@@ -1,7 +1,9 @@
 use rusqlite::{params, Connection};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::sync::Mutex;
 use tauri::{AppHandle, Manager, State, WindowEvent};
+use tauri_plugin_autostart::{MacosLauncher, ManagerExt};
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut, ShortcutState};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -50,7 +52,7 @@ fn extract_tags(content: &str) -> String {
 }
 
 // ---------------------------------------------------------------------------
-// Tauri Commands
+// Note Commands
 // ---------------------------------------------------------------------------
 
 #[tauri::command]
@@ -232,6 +234,64 @@ fn toggle_pin_note(id: i64, db: State<'_, DbState>) -> Result<bool, String> {
     Ok(is_pinned)
 }
 
+// ---------------------------------------------------------------------------
+// Settings Commands
+// ---------------------------------------------------------------------------
+
+#[tauri::command]
+fn get_settings(db: State<'_, DbState>) -> Result<HashMap<String, String>, String> {
+    let conn = db.0.lock().map_err(|e| e.to_string())?;
+    let mut stmt = conn
+        .prepare("SELECT key, value FROM settings")
+        .map_err(|e| e.to_string())?;
+
+    let rows = stmt
+        .query_map([], |row| {
+            Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?))
+        })
+        .map_err(|e| e.to_string())?;
+
+    let mut map = HashMap::new();
+    for item in rows {
+        let (k, v) = item.map_err(|e| e.to_string())?;
+        map.insert(k, v);
+    }
+    Ok(map)
+}
+
+#[tauri::command]
+fn update_setting(key: String, value: String, db: State<'_, DbState>) -> Result<(), String> {
+    let conn = db.0.lock().map_err(|e| e.to_string())?;
+    conn.execute(
+        "INSERT INTO settings (key, value) VALUES (?1, ?2) 
+         ON CONFLICT(key) DO UPDATE SET value = ?2",
+        params![key, value],
+    )
+    .map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+#[tauri::command]
+fn register_shortcut(shortcut: String, app: AppHandle) -> Result<(), String> {
+    let clean = shortcut.to_lowercase().replace(' ', "");
+    if let Ok(sc) = clean.parse::<Shortcut>() {
+        let _ = app.global_shortcut().unregister_all();
+        app.global_shortcut().register(sc).map_err(|e| e.to_string())?;
+    }
+    Ok(())
+}
+
+#[tauri::command]
+fn set_autostart(enabled: bool, app: AppHandle) -> Result<(), String> {
+    let autostart_mgr = app.autolaunch();
+    if enabled {
+        let _ = autostart_mgr.enable();
+    } else {
+        let _ = autostart_mgr.disable();
+    }
+    Ok(())
+}
+
 #[tauri::command]
 fn hide_window(app: AppHandle) -> Result<(), String> {
     if let Some(window) = app.get_webview_window("main") {
@@ -248,20 +308,20 @@ fn hide_window(app: AppHandle) -> Result<(), String> {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_sql::Builder::default().build())
+        .plugin(tauri_plugin_autostart::init(
+            MacosLauncher::LaunchAgent,
+            Some(vec!["--autostart"]),
+        ))
         .plugin(
             tauri_plugin_global_shortcut::Builder::new()
-                .with_handler(|app, shortcut, event| {
+                .with_handler(|app, _shortcut, event| {
                     if event.state() == ShortcutState::Pressed {
-                        if let Ok(alt_space) = "alt+space".parse::<Shortcut>() {
-                            if shortcut == &alt_space {
-                                if let Some(window) = app.get_webview_window("main") {
-                                    if window.is_visible().unwrap_or(false) {
-                                        let _ = window.hide();
-                                    } else {
-                                        let _ = window.show();
-                                        let _ = window.set_focus();
-                                    }
-                                }
+                        if let Some(window) = app.get_webview_window("main") {
+                            if window.is_visible().unwrap_or(false) {
+                                let _ = window.hide();
+                            } else {
+                                let _ = window.show();
+                                let _ = window.set_focus();
                             }
                         }
                     }
@@ -278,7 +338,7 @@ pub fn run() {
             let db_path = app_data_dir.join("qnotes.db");
             let conn = Connection::open(&db_path).map_err(|e| Box::new(e) as Box<dyn std::error::Error>)?;
 
-            // Create notes table with full schema
+            // Notes table
             conn.execute(
                 "CREATE TABLE IF NOT EXISTS notes (
                     id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -292,17 +352,45 @@ pub fn run() {
                 [],
             )?;
 
-            // Safe schema migrations if table existed previously
+            // Settings table
+            conn.execute(
+                "CREATE TABLE IF NOT EXISTS settings (
+                    key   TEXT PRIMARY KEY,
+                    value TEXT NOT NULL
+                );",
+                [],
+            )?;
+
+            // Default settings
+            conn.execute(
+                "INSERT OR IGNORE INTO settings (key, value) VALUES 
+                    ('is_first_run', 'true'),
+                    ('autostart', 'true'),
+                    ('shortcut', 'Alt+Space'),
+                    ('theme', 'midnight');",
+                [],
+            )?;
+
+            // Safe schema migrations
             let _ = conn.execute("ALTER TABLE notes ADD COLUMN title TEXT NOT NULL DEFAULT '';", []);
             let _ = conn.execute("ALTER TABLE notes ADD COLUMN tags TEXT NOT NULL DEFAULT '[]';", []);
             let _ = conn.execute("ALTER TABLE notes ADD COLUMN is_pinned BOOLEAN NOT NULL DEFAULT 0;", []);
 
-            app.manage(DbState(Mutex::new(conn)));
+            // Read shortcut from settings to register
+            let current_shortcut: String = conn
+                .query_row(
+                    "SELECT value FROM settings WHERE key = 'shortcut'",
+                    [],
+                    |row| row.get(0),
+                )
+                .unwrap_or_else(|_| "Alt+Space".to_string());
 
-            // Register Alt+Space shortcut
-            if let Ok(alt_space) = "alt+space".parse::<Shortcut>() {
-                let _ = app.global_shortcut().register(alt_space);
+            let clean_sc = current_shortcut.to_lowercase().replace(' ', "");
+            if let Ok(sc) = clean_sc.parse::<Shortcut>() {
+                let _ = app.global_shortcut().register(sc);
             }
+
+            app.manage(DbState(Mutex::new(conn)));
 
             Ok(())
         })
@@ -320,6 +408,10 @@ pub fn run() {
             delete_note,
             search_notes,
             toggle_pin_note,
+            get_settings,
+            update_setting,
+            register_shortcut,
+            set_autostart,
             hide_window,
         ])
         .run(tauri::generate_context!())

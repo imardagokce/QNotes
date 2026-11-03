@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { invoke } from '@tauri-apps/api/core'
 import { getCurrentWindow } from '@tauri-apps/api/window'
+import Onboarding from './components/Onboarding'
 
 export interface Note {
   id: number
@@ -13,6 +14,11 @@ export interface Note {
 }
 
 export default function App() {
+  const [isFirstRun, setIsFirstRun] = useState<boolean | null>(null)
+  const [activeShortcut, setActiveShortcut] = useState('Alt+Space')
+  const [activeTheme, setActiveTheme] = useState('midnight')
+  const [showSettings, setShowSettings] = useState(false)
+
   const [notes, setNotes] = useState<Note[]>([])
   const [query, setQuery] = useState('')
   const [selectedIndex, setSelectedIndex] = useState(0)
@@ -26,6 +32,19 @@ export default function App() {
   const listRef = useRef<HTMLDivElement>(null)
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  // Load Settings from SQLite
+  const loadSettings = useCallback(async () => {
+    try {
+      const settings = await invoke<Record<string, string>>('get_settings')
+      setIsFirstRun(settings['is_first_run'] === 'true')
+      if (settings['shortcut']) setActiveShortcut(settings['shortcut'])
+      if (settings['theme']) setActiveTheme(settings['theme'])
+    } catch (err) {
+      console.error('Failed to get settings:', err)
+      setIsFirstRun(false)
+    }
+  }, [])
+
   // Fetch all notes from SQLite
   const loadNotes = useCallback(async () => {
     try {
@@ -36,21 +55,21 @@ export default function App() {
     }
   }, [])
 
-  // Initial load
   useEffect(() => {
+    loadSettings()
     loadNotes()
-  }, [loadNotes])
+  }, [loadSettings, loadNotes])
 
   // Focus input whenever returning to search mode
   useEffect(() => {
-    if (!activeNote) {
+    if (!activeNote && !isFirstRun && !showSettings) {
       inputRef.current?.focus()
     }
-  }, [activeNote])
+  }, [activeNote, isFirstRun, showSettings])
 
   // Real-time search via Rust command `search_notes`
   useEffect(() => {
-    if (activeNote) return
+    if (activeNote || isFirstRun || showSettings) return
 
     const trimmed = query.trim()
     if (!trimmed) {
@@ -69,7 +88,7 @@ export default function App() {
     }, 60)
 
     return () => clearTimeout(timer)
-  }, [query, activeNote, loadNotes])
+  }, [query, activeNote, isFirstRun, showSettings, loadNotes])
 
   // Keep selectedIndex within bounds
   useEffect(() => {
@@ -142,7 +161,7 @@ export default function App() {
     try {
       const newNote = await invoke<Note>('create_note', { content })
       setQuery('')
-      flashStatus('Note created!')
+      flashStatus('Note captured!')
       await loadNotes()
       setSelectedIndex(0)
       inputRef.current?.focus()
@@ -168,7 +187,6 @@ export default function App() {
           content: newContent,
         })
         setActiveNote(updated)
-        // Refresh notes in background
         const refreshed = await invoke<Note[]>('get_notes')
         setNotes(refreshed)
       } catch (err) {
@@ -241,10 +259,12 @@ export default function App() {
   // Keyboard navigation & global hotkeys
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Escape: Back from editor or hide overlay
+      // Escape handler
       if (e.key === 'Escape') {
         e.preventDefault()
-        if (activeNote) {
+        if (showSettings) {
+          setShowSettings(false)
+        } else if (activeNote) {
           handleCloseEditor()
         } else if (query) {
           setQuery('')
@@ -253,6 +273,9 @@ export default function App() {
         }
         return
       }
+
+      // If in Settings
+      if (showSettings || isFirstRun) return
 
       // Inside Active Editor
       if (activeNote) {
@@ -275,7 +298,6 @@ export default function App() {
         setSelectedIndex((prev) => (prev > 0 ? prev - 1 : 0))
       } else if (e.key === 'Enter') {
         e.preventDefault()
-        // If user holds Ctrl/Meta or there are no search results, create note from query
         if ((e.ctrlKey || e.metaKey) && query.trim()) {
           handleCreateNote()
         } else if (notes.length === 0 && query.trim()) {
@@ -286,21 +308,53 @@ export default function App() {
           handleCreateNote()
         }
       } else if (e.key === 'Delete' && (e.ctrlKey || e.metaKey) && notes[selectedIndex]) {
-        // Quick delete selected item with Ctrl+Delete
         e.preventDefault()
         handleDeleteNote(notes[selectedIndex].id)
+      } else if (e.key === ',' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault()
+        setShowSettings(true)
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [activeNote, query, selectedIndex, notes])
+  }, [activeNote, query, selectedIndex, notes, showSettings, isFirstRun])
+
+  // Still checking settings on startup
+  if (isFirstRun === null) {
+    return <div className="w-full h-full bg-transparent" />
+  }
+
+  // First Run Onboarding Wizard OR Settings Modal
+  if (isFirstRun || showSettings) {
+    return (
+      <Onboarding
+        onComplete={({ shortcut, theme }) => {
+          setIsFirstRun(false)
+          setShowSettings(false)
+          setActiveShortcut(shortcut)
+          setActiveTheme(theme)
+          flashStatus('Preferences saved!')
+          loadNotes()
+        }}
+      />
+    )
+  }
+
+  // Theme modifier classes
+  const themeClasses =
+    activeTheme === 'obsidian'
+      ? 'bg-[#0a0a0c]/98 border-white/10'
+      : activeTheme === 'slate'
+      ? 'bg-[#0f172a]/98 border-emerald-500/20'
+      : 'bg-spotlight-bg/95 border-spotlight-border'
 
   return (
     <div className="w-full h-full p-2 flex items-center justify-center select-none bg-transparent">
       {/* Spotlight Card */}
-      <div className="w-full h-full flex flex-col bg-spotlight-bg/95 backdrop-blur-2xl rounded-2xl border border-spotlight-border shadow-spotlight overflow-hidden transition-all duration-200">
-        
+      <div
+        className={`w-full h-full flex flex-col backdrop-blur-2xl rounded-2xl border shadow-spotlight overflow-hidden transition-all duration-200 ${themeClasses}`}
+      >
         {/* Header Drag Region & Spotlight Bar */}
         <div
           data-tauri-drag-region
@@ -371,14 +425,23 @@ export default function App() {
             </div>
           )}
 
-          {/* Close / Hide Window */}
-          <button
-            onClick={handleHide}
-            className="w-6 h-6 flex items-center justify-center rounded-md text-spotlight-dim hover:text-spotlight-text hover:bg-white/5 transition-colors text-xs shrink-0"
-            title="Hide (Esc)"
-          >
-            ✕
-          </button>
+          {/* Settings & Close Buttons */}
+          <div className="flex items-center gap-1 shrink-0">
+            <button
+              onClick={() => setShowSettings(true)}
+              className="w-6 h-6 flex items-center justify-center rounded-md text-spotlight-dim hover:text-spotlight-text hover:bg-white/5 transition-colors text-xs"
+              title="Preferences (Ctrl+,)"
+            >
+              ⚙
+            </button>
+            <button
+              onClick={handleHide}
+              className="w-6 h-6 flex items-center justify-center rounded-md text-spotlight-dim hover:text-spotlight-text hover:bg-white/5 transition-colors text-xs"
+              title="Hide (Esc)"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         {/* Temporary Toast Banner */}
@@ -479,7 +542,6 @@ export default function App() {
                 notes.map((note, index) => {
                   const isSelected = index === selectedIndex
                   const tags = parseTags(note.tags)
-                  // Remaining snippet without title line
                   const contentLines = note.content.split('\n')
                   const snippet =
                     contentLines.length > 1
@@ -575,7 +637,7 @@ export default function App() {
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1">
               <kbd className="px-1 py-0.5 rounded bg-white/5 border border-white/10 font-mono text-[9px] text-spotlight-muted">
-                Alt+Space
+                {activeShortcut}
               </kbd>
               <span>Toggle</span>
             </span>
@@ -599,11 +661,12 @@ export default function App() {
             </span>
           </div>
 
-          <div className="font-mono text-[10px] text-spotlight-dim">
-            {notes.length} {notes.length === 1 ? 'note' : 'notes'}
+          <div className="flex items-center gap-2 font-mono text-[10px] text-spotlight-dim">
+            <span>
+              {notes.length} {notes.length === 1 ? 'note' : 'notes'}
+            </span>
           </div>
         </div>
-
       </div>
     </div>
   )

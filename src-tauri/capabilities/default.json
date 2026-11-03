@@ -7,6 +7,7 @@
     "core:default",
     "core:window:default",
     "global-shortcut:default",
+    "autostart:default",
     "sql:default"
   ]
 }
