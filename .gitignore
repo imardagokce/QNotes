@@ -1,0 +1,97 @@
+# ============================================================
+# QNotes — .gitignore
+# Tauri v2 + React (TypeScript) + TailwindCSS + SQLite
+# ============================================================
+
+# ── Node.js ─────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+.npm/
+.yarn/
+
+# ── Build output ─────────────────────────────────────────────
+dist/
+dist-ssr/
+build/
+out/
+.output/
+
+# ── Vite ─────────────────────────────────────────────────────
+*.local
+vite.config.*.timestamp-*
+
+# ── TypeScript ────────────────────────────────────────────────
+*.tsbuildinfo
+
+# ── Tauri / Rust ──────────────────────────────────────────────
+src-tauri/target/
+src-tauri/WixTools/
+src-tauri/gen/
+/src-tauri/*.dmg
+/src-tauri/*.app
+/src-tauri/*.exe
+/src-tauri/*.msi
+/src-tauri/*.AppImage
+/src-tauri/*.deb
+/src-tauri/*.rpm
+Cargo.lock
+
+# ── SQLite / Local database ──────────────────────────────────
+*.sqlite
+*.sqlite3
+*.sqlite-shm
+*.sqlite-wal
+*.db
+*.db-shm
+*.db-wal
+
+# ── Environment variables ────────────────────────────────────
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ── OS generated files ───────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ── Editor / IDE ─────────────────────────────────────────────
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swp
+
+# ── Test / Coverage ──────────────────────────────────────────
+coverage/
+.nyc_output/
+
+# ── Logs ─────────────────────────────────────────────────────
+logs/
+*.log
+
+# ── Temporary files ──────────────────────────────────────────
+tmp/
+temp/
+*.tmp
+*.bak
+*.orig

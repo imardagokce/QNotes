@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Overlay window — transparent/frameless Tauri window */
+:root {
+  --overlay-bg: #1a1a2e;
+  --overlay-surface: #16213e;
+  --overlay-border: #0f3460;
+  --overlay-accent: #e94560;
+  --overlay-text: #eaeaea;
+  --overlay-muted: #8888aa;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: transparent;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  color: var(--overlay-text);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--overlay-border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--overlay-muted);
+}
