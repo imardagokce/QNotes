@@ -301,6 +301,152 @@ fn hide_window(app: AppHandle) -> Result<(), String> {
 }
 
 // ---------------------------------------------------------------------------
+// AI Completion Command
+// ---------------------------------------------------------------------------
+
+#[tauri::command]
+async fn generate_ai_response(
+    prompt: String,
+    context: String,
+    db: State<'_, DbState>,
+) -> Result<String, String> {
+    let (provider, endpoint, api_key, model) = {
+        let conn = db.0.lock().map_err(|e| e.to_string())?;
+        let get_val = |k: &str, def: &str| -> String {
+            conn.query_row(
+                "SELECT value FROM settings WHERE key = ?1",
+                params![k],
+                |row| row.get(0),
+            )
+            .unwrap_or_else(|_| def.to_string())
+        };
+
+        (
+            get_val("ai_provider", "ollama"),
+            get_val("ai_endpoint", "http://localhost:11434"),
+            get_val("ai_api_key", ""),
+            get_val("ai_model", "llama3"),
+        )
+    };
+
+    let user_message = if context.trim().is_empty() {
+        prompt.clone()
+    } else {
+        format!("Task: {}\n\nNote:\n\"\"\"\n{}\n\"\"\"", prompt, context)
+    };
+
+    let client = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(90))
+        .build()
+        .map_err(|e| format!("Failed to build HTTP client: {}", e))?;
+
+    if provider.to_lowercase() == "anthropic" {
+        // Native Anthropic Messages API
+        let base = endpoint.trim().trim_end_matches('/');
+        let url = if base.ends_with("/messages") {
+            base.to_string()
+        } else if base.ends_with("/v1") {
+            format!("{}/messages", base)
+        } else {
+            format!("{}/v1/messages", base)
+        };
+
+        let body = serde_json::json!({
+            "model": model,
+            "max_tokens": 2048,
+            "system": "You are QNotes AI Assistant. Help the user process, summarize, or improve quick notes. Output only the requested result concisely and clearly, without unnecessary conversational filler.",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": user_message
+                }
+            ]
+        });
+
+        let mut req = client.post(&url)
+            .header("content-type", "application/json")
+            .header("anthropic-version", "2023-06-01");
+
+        if !api_key.trim().is_empty() {
+            req = req.header("x-api-key", api_key.trim());
+        }
+
+        let resp = req.json(&body).send().await.map_err(|e| {
+            format!("Connection failed to {}: {}", url, e)
+        })?;
+
+        let status = resp.status();
+        let resp_text = resp.text().await.unwrap_or_default();
+
+        if !status.is_success() {
+            return Err(format!("Anthropic API error ({}): {}", status, resp_text));
+        }
+
+        let val: serde_json::Value = serde_json::from_str(&resp_text).map_err(|e| {
+            format!("Failed to parse response JSON: {}", e)
+        })?;
+
+        if let Some(text) = val["content"][0]["text"].as_str() {
+            Ok(text.trim().to_string())
+        } else {
+            Err(format!("Could not extract text from Anthropic response: {}", resp_text))
+        }
+    } else {
+        // OpenAI-compatible /v1/chat/completions (OpenAI, Ollama, LM Studio, etc.)
+        let base = endpoint.trim().trim_end_matches('/');
+        let url = if base.ends_with("/chat/completions") {
+            base.to_string()
+        } else if base.ends_with("/v1") {
+            format!("{}/chat/completions", base)
+        } else {
+            format!("{}/v1/chat/completions", base)
+        };
+
+        let body = serde_json::json!({
+            "model": model,
+            "messages": [
+                {
+                    "role": "system",
+                    "content": "You are QNotes AI Assistant. Help the user process, summarize, or improve quick notes. Output only the requested result concisely and clearly, without unnecessary conversational filler."
+                },
+                {
+                    "role": "user",
+                    "content": user_message
+                }
+            ]
+        });
+
+        let mut req = client.post(&url)
+            .header("content-type", "application/json");
+
+        if !api_key.trim().is_empty() {
+            req = req.header("authorization", format!("Bearer {}", api_key.trim()));
+        }
+
+        let resp = req.json(&body).send().await.map_err(|e| {
+            format!("Connection failed to {}: {}", url, e)
+        })?;
+
+        let status = resp.status();
+        let resp_text = resp.text().await.unwrap_or_default();
+
+        if !status.is_success() {
+            return Err(format!("AI server returned HTTP {}: {}", status, resp_text));
+        }
+
+        let val: serde_json::Value = serde_json::from_str(&resp_text).map_err(|e| {
+            format!("Failed to parse response JSON: {}", e)
+        })?;
+
+        if let Some(content) = val["choices"][0]["message"]["content"].as_str() {
+            Ok(content.trim().to_string())
+        } else {
+            Err(format!("Could not extract content from AI response: {}", resp_text))
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
 // App Entry
 // ---------------------------------------------------------------------------
 
@@ -367,7 +513,11 @@ pub fn run() {
                     ('is_first_run', 'true'),
                     ('autostart', 'true'),
                     ('shortcut', 'Alt+Space'),
-                    ('theme', 'midnight');",
+                    ('theme', 'midnight'),
+                    ('ai_provider', 'ollama'),
+                    ('ai_endpoint', 'http://localhost:11434'),
+                    ('ai_api_key', ''),
+                    ('ai_model', 'llama3');",
                 [],
             )?;
 
@@ -412,6 +562,7 @@ pub fn run() {
             update_setting,
             register_shortcut,
             set_autostart,
+            generate_ai_response,
             hide_window,
         ])
         .run(tauri::generate_context!())

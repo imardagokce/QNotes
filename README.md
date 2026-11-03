@@ -27,7 +27,7 @@
 
 <div align="center">
   <br />
-  <img src="https://via.placeholder.com/1200x680/121217/6366f1?text=QNotes+Spotlight+Overlay+Preview" alt="QNotes Spotlight Overlay Demo" width="800" style="border-radius: 16px; box-shadow: 0 25px 60px -15px rgba(0,0,0,0.85);" />
+  <img src="https://via.placeholder.com/1200x680/121217/6366f1?text=QNotes+Spotlight+Overlay+Preview+(Coming+Soon)" alt="QNotes Spotlight Overlay Demo" width="800" style="border-radius: 16px; box-shadow: 0 25px 60px -15px rgba(0,0,0,0.85);" />
   <br />
   <p align="center"><em>Raycast-inspired minimalist Spotlight overlay with real-time search, instant capture, and inline editor.</em></p>
   <br />
